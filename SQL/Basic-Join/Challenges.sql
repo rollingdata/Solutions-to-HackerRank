@@ -6,7 +6,7 @@ from Hackers as h
     inner join Challenges as c on c.hacker_id = h.hacker_id
 
 /* after they have been grouped by hacker */
-group by c.hacker_id
+group by c.hacker_id, h.name
 
 /* but we want to be selective about which hackers we output */
 /* having is required (instead of where) for filtering on groups */
@@ -24,14 +24,14 @@ having
     /* or anyone who's count is in... */
     or c_count in 
         /* the set of counts... */
-        (select t.cnt
+        (select temp2.cnt
          from (select count(*) as cnt 
                from challenges
-               group by hacker_id) t
+               group by hacker_id) temp2
          /* who's group of counts... */
-         group by t.cnt
+         group by temp2.cnt
          /* has only one element */
-         having count(t.cnt) = 1)
+         having count(temp2.cnt) = 1)
 
 /* finally, the order the rows should be output */
 order by c_count DESC, c.hacker_id
